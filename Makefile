@@ -1,5 +1,5 @@
 CXXFLAGS = -Wall -Werror -std=c++11
-SDL2FLAGS = -I /usr/local/include/ -lSDL2
+SDL2FLAGS = -lSDL2
 SDL2FLAGS_NOBREW = -F /Library/Frameworks -framework SDL2
 execs = chip8emu chip8emu_brew
 
