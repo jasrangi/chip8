@@ -11,18 +11,11 @@ is strictly educational.
 Dependencies: [SDL2](https://www.libsdl.org/download-2.0.php) \
 For licensing information about SDL2, see the 
 [SDL License page](https://www.libsdl.org/license.php). \
-To build the CHIP-8 emulator with SDL2 installed using 
-[Homebrew](https://brew.sh), clone this repository and run make.
+To build the CHIP-8 emulator clone this repository and run make.
 ```sh
 git clone <url>
 cd chip8
 make
-```
-If SDL2 was not installed using the Homebrew package 
-manager and was instead installed directly from the SDL2 website, run the 
-following command instead of "make".
-```sh
-make chip8emu_nobrew
 ```
 
 ## Usage
@@ -42,18 +35,28 @@ folder as PONG2.
 ```sh
 ./chip8emu PONG2
 ```
+Optionally, you can also specify the CPU clock speed and graphical window 
+scale.
+```sh
+</path/to/executable> <program> <Clock Speed (Hertz)> <Window scale>
+```
+The default window size (scale = 1) is 64 x 32. Therefore a scale of 15 
+will result in a window of size 960 x 480. If no arguments for clock 
+speed and window scale are provided, they will be set to 1000 and 15
+respectively.
+### Controls
 A CHIP-8 keypad has 16 keys. Below is a diagram of how the emulator maps
-the keys on your keyboard (left) to CHIP-8 keys that a CHIP-8 program works with
-(right). \
+the keys on your keyboard (left) to CHIP-8 keys that a CHIP-8 program 
+works with (right). \
 1 2 3 4 &nbsp; -> &nbsp; &nbsp; 1 2 3 C \
 Q W E R &nbsp; -> &nbsp; 4 5 6 D \
 A S D F &nbsp; -> &nbsp; &nbsp; 7 8 9 E \
 Z X C V &nbsp; -> &nbsp; &nbsp; A 0 B F
 
 ## Current Limitations
-This emulator has only been tested to work well with PONG2 on a 2017
-MacBook Pro with an Intel i5-7360U @ 2.3 GHz and 8 GB RAM. Sound has not yet
-been implemented. 
+This emulator has only been tested to work well with PONG2 on default 
+settings. However, it may work with other programs if the clock speed is 
+properly set.
 
 ## Sources
 The following sources were used to understand CHIP-8 Hardware specifications

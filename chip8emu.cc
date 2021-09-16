@@ -7,25 +7,39 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <string>
+#include <chrono>
 
 void update_renderer(const Chip8& chip8, SDL_Renderer* renderer,
 const int width, const int height, const int scale);
 void process_input(Chip8* chip8, SDL_Event& key_event, bool& end);
 
 int main(int argc, char** argv) {
-  if (argc != 2) {
-    std::cerr << "USAGE: ./chip8emu <ROM>" << std::endl;
+  int clock_speed;
+  int window_scale;
+  if (argc < 2) {
+    std::cerr << "USAGE: ./chip8emu <ROM> <Clock Speed (Hz)> <Window Scale>" 
+    << std::endl;
     return 1;
+  } else if (argc == 2) {
+    clock_speed = 1000;
+    window_scale = 15;
+  } else if (argc == 3) {
+    clock_speed = std::stoi(argv[2]);
+    window_scale = 15;
+  } else {
+    clock_speed = std::stoi(argv[2]);
+    window_scale = std::stoi(argv[3]);
   }
+  
 
   Chip8 chip8;
   SDL_Event key_event;
   SDL_Window* window;
   SDL_Renderer* renderer;
   bool end = false;
-  const int width = 960;
-  const int height = 480;
-  const int scale = width / 64;
+  const int width = window_scale * 64;
+  const int height = window_scale * 32;
+  const int clock_interval_microsecond = 1000000 / clock_speed;
 
   if (!(chip8.load_prog(std::string(argv[1])))) {
     return 1;
@@ -42,18 +56,50 @@ int main(int argc, char** argv) {
   SDL_RenderClear(renderer);
   SDL_RenderPresent(renderer);
 
+  /* set up timers for clock speed control */
+  std::chrono::time_point<std::chrono::system_clock,
+  std::chrono::duration<long, std::ratio<1, 1000000000>>> cycle_start;
+
+  std::chrono::time_point<std::chrono::system_clock,
+  std::chrono::duration<long, std::ratio<1, 1000000000>>> cycle_stop;
+
+  std::chrono::duration<long, std::ratio<1, 1000000>> cycle_duration;
+
+  std::chrono::time_point<std::chrono::system_clock,
+  std::chrono::duration<long, std::ratio<1, 1000000000>>> slowdown_start;
+
+  std::chrono::time_point<std::chrono::system_clock,
+  std::chrono::duration<long, std::ratio<1, 1000000000>>> slowdown_stop;
+
+  std::chrono::duration<long, std::ratio<1, 1000000>> slowdown_difference;
+
   while (!end) {
+    cycle_start = std::chrono::high_resolution_clock::now();
     chip8.run_cycle();
 
     if (chip8.sound_ctrl) {
-      std::cout << "Sound played" << std::endl;
+      /* play a sound here */
       chip8.sound_ctrl = 0;
     }
 
     if (chip8.update_screen) {
-      update_renderer(chip8, renderer, width, height, scale);
+      update_renderer(chip8, renderer, width, height, window_scale);
       SDL_RenderPresent(renderer);
       chip8.update_screen = 0;
+    }
+    cycle_stop = std::chrono::high_resolution_clock::now();
+    cycle_duration = std::chrono::duration_cast<std::chrono::microseconds>(
+    cycle_stop - cycle_start);
+
+    if (cycle_duration.count() < clock_interval_microsecond) {
+      auto target = clock_interval_microsecond - cycle_duration.count();
+      slowdown_start = std::chrono::high_resolution_clock::now();
+      do {
+        slowdown_stop = std::chrono::high_resolution_clock::now();
+        slowdown_difference =
+        std::chrono::duration_cast<std::chrono::microseconds>(slowdown_stop -
+        slowdown_start);
+      } while (slowdown_difference.count() < target);
     }
 
     process_input(&chip8, key_event, end);
