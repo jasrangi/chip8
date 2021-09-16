@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
   int clock_speed;
   int window_scale;
   if (argc < 2) {
-    std::cerr << "USAGE: ./chip8emu <ROM> <Clock Speed (Hz)> <Window Scale>" 
+    std::cerr << "USAGE: ./chip8emu <ROM> <Clock Speed (Hz)> <Window Scale>"
     << std::endl;
     return 1;
   } else if (argc == 2) {
@@ -30,8 +30,7 @@ int main(int argc, char** argv) {
     clock_speed = std::stoi(argv[2]);
     window_scale = std::stoi(argv[3]);
   }
-  
-
+ 
   Chip8 chip8;
   SDL_Event key_event;
   SDL_Window* window;
@@ -57,21 +56,12 @@ int main(int argc, char** argv) {
   SDL_RenderPresent(renderer);
 
   /* set up timers for clock speed control */
-  std::chrono::time_point<std::chrono::system_clock,
-  std::chrono::duration<long, std::ratio<1, 1000000000>>> cycle_start;
-
-  std::chrono::time_point<std::chrono::system_clock,
-  std::chrono::duration<long, std::ratio<1, 1000000000>>> cycle_stop;
-
-  std::chrono::duration<long, std::ratio<1, 1000000>> cycle_duration;
-
-  std::chrono::time_point<std::chrono::system_clock,
-  std::chrono::duration<long, std::ratio<1, 1000000000>>> slowdown_start;
-
-  std::chrono::time_point<std::chrono::system_clock,
-  std::chrono::duration<long, std::ratio<1, 1000000000>>> slowdown_stop;
-
-  std::chrono::duration<long, std::ratio<1, 1000000>> slowdown_difference;
+  std::chrono::high_resolution_clock::time_point cycle_start;
+  std::chrono::high_resolution_clock::time_point cycle_stop;
+  std::chrono::duration<long, std::micro> cycle_duration;
+  std::chrono::high_resolution_clock::time_point slowdown_start;
+  std::chrono::high_resolution_clock::time_point slowdown_stop;
+  std::chrono::duration<long, std::micro> slowdown_difference;
 
   while (!end) {
     cycle_start = std::chrono::high_resolution_clock::now();
