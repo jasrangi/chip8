@@ -33,7 +33,7 @@ shell:
 Here is an example of running PONG2, where the executable is located in the same
 folder as PONG2.
 ```sh
-./chip8emu PONG2
+./chip8emulator PONG2
 ```
 Optionally, you can also specify the CPU clock speed and graphical window 
 scale.

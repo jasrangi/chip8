@@ -1,11 +1,18 @@
-CXXFLAGS = -Wall -Werror -std=c++17
+CXXFLAGS = -Wall -Werror -MMD -std=c++17
 SDL2FLAGS = -lSDL2
-execs = chip8emu
+execs = chip8emulator
+objs = chip8.o chip8emu.o
 
-all: chip8emu
+all: $(execs)
 
-chip8emu: chip8.cc chip8emu.cc
+deps = $(patsubst %.o,%.d,$(objs))
+-include $(deps)
+
+chip8emulator: $(objs)
 	$(CXX) $(CXXFLAGS) $(SDL2FLAGS) -o $@ $^
 
+%.o: %.cc
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
 clean:
-	rm -f $(execs)
+	rm -f $(execs) $(objs) $(deps)
